@@ -71,6 +71,7 @@ plugins.withId("java") {
 
 dependencies {
     trivy("aquasecurity:trivy:0.41.0:$driverOsFilenamePart@tar.gz")
+    implementation("org.apache.commons:commons-lang3:3.9")
 }
 
 tasks.register<Sync>("syncTrivy") {
