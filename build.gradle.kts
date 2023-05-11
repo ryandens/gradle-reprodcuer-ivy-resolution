@@ -17,6 +17,25 @@ val driverOsFilenamePart = when {
     else -> "Linux-32bit"
 }
 
+open class PomRule @Inject constructor(private val baseVariant: String) : ComponentMetadataRule {
+
+    @Inject
+    open fun getObjects(): ObjectFactory = throw UnsupportedOperationException()
+
+
+    override fun execute(context: ComponentMetadataContext) {
+        context.details.maybeAddVariant("pom", baseVariant) {
+            attributes {
+                attribute(Category.CATEGORY_ATTRIBUTE, getObjects().named(Category.DOCUMENTATION))
+                attribute(DocsType.DOCS_TYPE_ATTRIBUTE, getObjects().named("pom"))
+            }
+            withFiles {
+                removeAllFiles()
+                addFile("${context.details.id.name}-${context.details.id.version}.pom")
+            }
+        }
+    }
+}
 
 repositories {
     exclusiveContent {
@@ -40,6 +59,14 @@ repositories {
 val trivy by configurations.creating {
     isCanBeResolved = true
     isCanBeConsumed = false
+}
+
+plugins.withId("java") {
+    dependencies.components {
+        all<PomRule> {
+            params("runtime")
+        }
+    }
 }
 
 dependencies {
